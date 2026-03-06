@@ -1,0 +1,155 @@
+<div class="favorites-page">
+
+  <!-- ══ CABECERA ══ -->
+  <header class="fav-header">
+    <div class="header-left">
+      <a routerLink="/buscar" class="back-btn" aria-label="Volver a buscar recetas">← Volver</a>
+      <div>
+        <h1 class="page-title">
+          <span class="title-icon" aria-hidden="true">❤️</span>
+          Mis Favoritos
+        </h1>
+        @if (!isLoading() && !errorMessage()) {
+          <p class="page-subtitle">
+            {{ favorites().length }}{{ hasMore() ? '+' : '' }}
+            receta{{ favorites().length === 1 ? '' : 's' }} guardada{{ favorites().length === 1 ? '' : 's' }}
+          </p>
+        }
+      </div>
+    </div>
+  </header>
+
+  <!-- ══ ERROR ══ -->
+  @if (errorMessage()) {
+    <div class="error-state" role="alert">
+      <span class="error-icon">⚠️</span>
+      <p>{{ errorMessage() }}</p>
+      <p class="error-hint">Asegúrate de que Firebase esté configurado correctamente.</p>
+    </div>
+  }
+
+  <!-- ══ LOADING INICIAL (esqueletos) ══ -->
+  @if (isLoading()) {
+    <div class="recipes-grid" aria-busy="true" aria-label="Cargando favoritos">
+      @for (_ of [1,2,3,4,5,6]; track $index) {
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-line wide"></div>
+            <div class="skeleton-line narrow"></div>
+            <div class="skeleton-line narrow"></div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ══ ESTADO VACÍO ══ -->
+  @if (!isLoading() && !errorMessage() && favorites().length === 0) {
+    <div class="empty-state">
+      <span class="empty-icon">🍽️</span>
+      <h2>Aún no tienes favoritos</h2>
+      <p>Busca recetas y guarda las que más te gusten.</p>
+      <a routerLink="/buscar" class="btn-primary">Buscar recetas</a>
+    </div>
+  }
+
+  <!-- ══ GRID DE FAVORITOS ══ -->
+  @if (!isLoading() && favorites().length > 0) {
+    <section aria-label="Lista de recetas favoritas">
+      <div class="recipes-grid">
+        @for (recipe of favorites(); track recipe.idMeal) {
+          <article
+            class="recipe-card"
+            [class.is-removing]="isRemoving(recipe.idMeal)"
+            aria-label="{{ recipe.strMeal }}"
+          >
+            <!-- Imagen -->
+            <div class="card-image">
+              <img
+                [src]="recipe.strMealThumb"
+                [alt]="recipe.strMeal"
+                loading="lazy"
+              />
+              <span class="fav-badge" aria-label="Favorito">❤️</span>
+            </div>
+
+            <!-- Cuerpo -->
+            <div class="card-body">
+              <h3 class="card-title" [title]="recipe.strMeal">
+                {{ recipe.strMeal }}
+              </h3>
+
+              <!-- Metadatos -->
+              <div class="card-meta">
+                <span class="meta-item meta-time" title="Tiempo estimado">
+                  <span aria-hidden="true">⏱</span>
+                  {{ recipe.estimatedMinutes }} min
+                </span>
+                <span class="meta-item meta-kcal" title="Estimación calórica">
+                  <span aria-hidden="true">🔥</span>
+                  {{ recipe.estimatedKcal }} kcal
+                </span>
+                <span class="meta-item meta-date" title="Fecha guardada">
+                  <span aria-hidden="true">📅</span>
+                  {{ formatDate(recipe.savedAt) }}
+                </span>
+              </div>
+
+              <!-- Acciones -->
+              <div class="card-actions">
+                <a
+                  [href]="getMealDetailUrl(recipe.idMeal)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn-details"
+                  [attr.aria-label]="'Ver detalles de ' + recipe.strMeal"
+                >Ver detalles</a>
+
+                <a
+                  [routerLink]="['/lista-compras', recipe.idMeal]"
+                  class="btn-shopping"
+                  [attr.aria-label]="'Lista de compras de ' + recipe.strMeal"
+                >🛒 Lista</a>
+
+                <button
+                  class="btn-remove"
+                  [disabled]="isRemoving(recipe.idMeal)"
+                  (click)="removeFavorite(recipe.idMeal)"
+                  [attr.aria-label]="'Eliminar ' + recipe.strMeal + ' de favoritos'"
+                >
+                  @if (isRemoving(recipe.idMeal)) {
+                    <span class="btn-spinner" aria-hidden="true"></span>
+                  } @else {
+                    🗑️
+                  }
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+
+      <!-- ══ CENTINELA PARA INFINITE SCROLL ══ -->
+      <div
+        #sentinel
+        class="scroll-sentinel"
+        aria-hidden="true"
+      ></div>
+
+      <!-- Indicador de carga de más ítems -->
+      @if (isLoadingMore()) {
+        <div class="loading-more" aria-live="polite">
+          <div class="spinner-sm"></div>
+          <span>Cargando más favoritos…</span>
+        </div>
+      }
+
+      @if (!hasMore() && favorites().length > 0) {
+        <p class="end-message">— Has visto todos tus favoritos —</p>
+      }
+    </section>
+  }
+
+</div>

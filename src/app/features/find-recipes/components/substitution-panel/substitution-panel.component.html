@@ -1,0 +1,89 @@
+@if (hasSuggestions()) {
+  <aside class="sub-panel" [class.is-open]="isOpen()">
+
+    <!-- ── Cabecera colapsable ── -->
+    <button
+      class="panel-header"
+      (click)="toggle()"
+      [attr.aria-expanded]="isOpen()"
+      aria-controls="sub-panel-body"
+    >
+      <span class="header-left">
+        <span class="panel-icon" aria-hidden="true">💡</span>
+        <span class="panel-title">Sustituciones sugeridas</span>
+        <span class="badge">{{ suggestions().length }}</span>
+      </span>
+      <span class="chevron" aria-hidden="true">{{ isOpen() ? '▲' : '▼' }}</span>
+    </button>
+
+    <!-- ── Cuerpo ── -->
+    @if (isOpen()) {
+      <div class="panel-body" id="sub-panel-body" role="region">
+
+        @for (suggestion of suggestions(); track suggestion.originalIngredient.idIngredient) {
+          <div class="suggestion-group">
+
+            <!-- Ingrediente original -->
+            <div class="group-header">
+              <img
+                [src]="getThumb(suggestion.originalIngredient.strIngredient)"
+                [alt]="suggestion.originalIngredient.strIngredient"
+                class="orig-thumb"
+                width="28"
+                height="28"
+              />
+              <span class="orig-name">{{ suggestion.originalIngredient.strIngredient }}</span>
+              <span class="arrow" aria-hidden="true">→</span>
+              <span class="hint">elige un sustituto</span>
+            </div>
+
+            <!-- Tarjetas de sustitutos -->
+            <div class="sub-cards" role="list">
+              @for (sub of suggestion.substitutes; track sub.substituteIngredient) {
+                <button
+                  class="sub-card"
+                  role="listitem"
+                  (click)="applySubstitute(suggestion.originalIngredient, sub)"
+                  [attr.aria-label]="'Reemplazar ' + suggestion.originalIngredient.strIngredient + ' con ' + sub.label"
+                  title="{{ sub.description }}"
+                >
+                  <!-- Imagen del sustituto -->
+                  <img
+                    [src]="getThumb(sub.substituteIngredient)"
+                    [alt]="sub.label"
+                    class="sub-thumb"
+                    width="52"
+                    height="52"
+                    loading="lazy"
+                  />
+
+                  <!-- Nombre -->
+                  <span class="sub-name">{{ sub.label }}</span>
+
+                  <!-- Ratio -->
+                  <span class="sub-ratio">{{ sub.ratio }}</span>
+
+                  <!-- Descripción -->
+                  <span class="sub-desc">{{ sub.description }}</span>
+
+                  <!-- Tags -->
+                  <div class="tag-row">
+                    @for (tag of sub.tags; track tag) {
+                      <span class="tag tag--{{ tag }}">{{ tag }}</span>
+                    }
+                  </div>
+
+                  <!-- CTA visual -->
+                  <span class="sub-cta">Reemplazar ↗</span>
+                </button>
+              }
+            </div>
+
+          </div>
+        }
+
+      </div>
+    }
+
+  </aside>
+}

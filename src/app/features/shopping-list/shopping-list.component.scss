@@ -1,0 +1,451 @@
+// ── Variables ────────────────────────────────────────────────────────────────
+$primary:       #e67e22;
+$primary-dark:  #d35400;
+$primary-light: #fff3e0;
+$success:       #27ae60;
+$success-bg:    #eafaf1;
+$surface:       #ffffff;
+$bg:            #f8f8f8;
+$border:        #e5e5e5;
+$text:          #2c2c2c;
+$text-muted:    #757575;
+$checked-text:  #aaa;
+$radius-sm:     6px;
+$radius-md:     12px;
+$transition:    150ms ease;
+
+// ── Contenedor ───────────────────────────────────────────────────────────────
+.shopping-list {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1rem 1rem 5rem;
+  font-family: system-ui, sans-serif;
+  color: $text;
+}
+
+// ── Cabecera ─────────────────────────────────────────────────────────────────
+.sl-header {
+  margin-bottom: 1rem;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: $primary;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.35rem 0.6rem;
+  border-radius: $radius-sm;
+  transition: background $transition;
+
+  &:hover { background: $primary-light; }
+}
+
+// ── Loading ───────────────────────────────────────────────────────────────────
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 0;
+  color: $text-muted;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid $border;
+  border-top-color: $primary;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ── Error ─────────────────────────────────────────────────────────────────────
+.error-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: $text-muted;
+
+  p { font-size: 1rem; margin-bottom: 1rem; }
+}
+
+.btn-back-link {
+  color: $primary;
+  font-weight: 600;
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
+}
+
+// ── Banner de la receta ───────────────────────────────────────────────────────
+.meal-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  padding: 0.875rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.meal-thumb {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+}
+
+.meal-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.meal-category {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $primary;
+  margin-bottom: 0.2rem;
+}
+
+.meal-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 0.2rem;
+  line-height: 1.25;
+  // Truncar texto largo
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sl-subtitle {
+  font-size: 0.8rem;
+  color: $text-muted;
+  margin: 0;
+}
+
+// ── Progreso ─────────────────────────────────────────────────────────────────
+.progress-wrap {
+  margin-bottom: 1rem;
+}
+
+.progress-bar {
+  height: 10px;
+  background: $border;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, $primary, $primary-dark);
+  border-radius: 999px;
+  transition: width 400ms cubic-bezier(.4,0,.2,1);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 4px;
+}
+
+.progress-text {
+  font-size: 0.6rem;
+  color: white;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.progress-label {
+  font-size: 0.82rem;
+  color: $text-muted;
+  margin: 0;
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.done-msg {
+  color: $success;
+  font-weight: 600;
+}
+
+.pending {
+  color: $text-muted;
+}
+
+// ── Acciones masivas ─────────────────────────────────────────────────────────
+.bulk-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.875rem;
+  flex-wrap: wrap;
+}
+
+.btn-bulk {
+  padding: 0.4rem 0.9rem;
+  background: $bg;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: $text;
+  transition: background $transition, border-color $transition;
+
+  &:hover { background: darken-safe(#f8f8f8); border-color: #ccc; }
+}
+
+.btn-clear {
+  color: #c0392b;
+  border-color: #f5c6c2;
+  background: #fdf2f2;
+  &:hover { background: #fce8e6; }
+}
+
+// ── Checklist ─────────────────────────────────────────────────────────────────
+.checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  overflow: hidden;
+  background: $surface;
+}
+
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid $border;
+  cursor: pointer;
+  transition: background $transition;
+  user-select: none;
+
+  &:last-child { border-bottom: none; }
+
+  &:hover { background: $bg; }
+
+  &:active { background: $primary-light; }
+
+  &.is-checked {
+    background: $success-bg;
+
+    .checkbox {
+      background: $success;
+      border-color: $success;
+      color: white;
+    }
+
+    .item-ingredient {
+      text-decoration: line-through;
+      color: $checked-text;
+    }
+
+    .item-measure {
+      color: $checked-text;
+    }
+  }
+}
+
+// Checkbox visual
+.checkbox {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border: 2px solid $border;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: white;
+  background: $surface;
+  transition: background $transition, border-color $transition;
+}
+
+.item-content {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.item-measure {
+  font-size: 0.82rem;
+  color: $text-muted;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: color $transition;
+}
+
+.item-ingredient {
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color $transition, text-decoration $transition;
+}
+
+// ── Exportar ─────────────────────────────────────────────────────────────────
+.export-section {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid $border;
+}
+
+.export-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: $text-muted;
+  margin: 0 0 0.75rem;
+}
+
+.export-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+
+  @media (max-width: 400px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.btn-export {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color $transition, box-shadow $transition, background $transition;
+
+  &:hover {
+    border-color: $primary;
+    box-shadow: 0 0 0 3px rgba($primary, 0.1);
+    background: $primary-light;
+  }
+}
+
+.export-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.export-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+
+  strong { font-size: 0.875rem; color: $text; }
+  small  { font-size: 0.75rem; color: $text-muted; }
+}
+
+// ── Ayuda visual bulk ─────────────────────────────────────────────────────────
+// (no usar darken() deprecated - evitar la función)
+.btn-bulk:hover {
+  background: #eeeeee;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ESTILOS DE IMPRESIÓN  @media print
+// ══════════════════════════════════════════════════════════════════════════════
+@media print {
+  // Ocultar UI de la app
+  .no-print { display: none !important; }
+
+  // Ocultar el componente principal en pantalla de impresión
+  .shopping-list { display: none !important; }
+
+  // Mostrar solo la hoja imprimible
+  .print-only { display: block !important; }
+}
+
+// La hoja imprimible está oculta en pantalla
+.print-only {
+  display: none;
+}
+
+// ── Hoja imprimible ───────────────────────────────────────────────────────────
+.print-sheet {
+  font-family: Georgia, serif;
+  padding: 2cm;
+  color: #000;
+}
+
+.print-title {
+  font-size: 1.6rem;
+  margin: 0 0 0.25rem;
+}
+
+.print-meal {
+  font-size: 1.2rem;
+  margin: 0 0 1.5rem;
+  font-weight: normal;
+  color: #444;
+  border-bottom: 2px solid #000;
+  padding-bottom: 0.5rem;
+}
+
+.print-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.print-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px dashed #ccc;
+  font-size: 1rem;
+  break-inside: avoid;
+
+  &.print-checked {
+    .print-ingredient { text-decoration: line-through; color: #888; }
+    .print-measure    { color: #888; }
+  }
+}
+
+.print-checkbox {
+  font-size: 1rem;
+  flex-shrink: 0;
+  min-width: 1.5rem;
+}
+
+.print-measure {
+  min-width: 5rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.print-ingredient {
+  font-weight: 500;
+}
+
+.print-footer {
+  margin-top: 1.5rem;
+  font-size: 0.85rem;
+  color: #666;
+  border-top: 1px solid #ccc;
+  padding-top: 0.5rem;
+}

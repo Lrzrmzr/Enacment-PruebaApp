@@ -1,0 +1,248 @@
+// ── Variables ────────────────────────────────────────────────────────────────
+$amber:         #f39c12;
+$amber-dark:    #e67e22;
+$amber-bg:      #fef9e7;
+$amber-border:  #fdebd0;
+$surface:       #ffffff;
+$bg:            #f8f8f8;
+$border:        #e5e5e5;
+$text:          #2c2c2c;
+$text-muted:    #757575;
+$radius-sm:     6px;
+$radius-md:     12px;
+$transition:    150ms ease;
+
+// Tag palette
+$tag-vegano:       (#1e8449, #eafaf1, #a9dfbf);
+$tag-sin-lactosa:  (#1a5276, #ebf5fb, #7fb3d3);
+$tag-sin-gluten:   (#7d6608, #fef9e7, #f9e79f);
+$tag-saludable:    (#0e6655, #e8f8f5, #76d7c4);
+$tag-economico:    (#784212, #fdf2e9, #f0b27a);
+
+// ── Contenedor del panel ─────────────────────────────────────────────────────
+.sub-panel {
+  border: 1px solid $amber-border;
+  border-radius: $radius-md;
+  background: $amber-bg;
+  margin: 1rem 0;
+  overflow: hidden;
+  transition: box-shadow $transition;
+
+  &:focus-within,
+  &.is-open {
+    box-shadow: 0 2px 12px rgba($amber, 0.18);
+  }
+}
+
+// ── Cabecera colapsable ───────────────────────────────────────────────────────
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background $transition;
+  border-radius: $radius-md $radius-md 0 0;
+
+  &:hover { background: rgba($amber, 0.08); }
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.panel-icon {
+  font-size: 1.1rem;
+}
+
+.panel-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: darken-safe($amber-dark);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: $amber-dark;
+  color: white;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.chevron {
+  font-size: 0.75rem;
+  color: $text-muted;
+}
+
+// ── Cuerpo del panel ──────────────────────────────────────────────────────────
+.panel-body {
+  padding: 0 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+// ── Grupo por ingrediente ─────────────────────────────────────────────────────
+.group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.orig-thumb {
+  border-radius: $radius-sm;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.orig-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: $text;
+}
+
+.arrow {
+  color: $amber-dark;
+  font-weight: 700;
+}
+
+.hint {
+  font-size: 0.78rem;
+  color: $text-muted;
+  font-style: italic;
+}
+
+// ── Fila de tarjetas (scroll horizontal en mobile) ───────────────────────────
+.sub-cards {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+  scrollbar-width: thin;
+  scrollbar-color: $border transparent;
+
+  // En pantallas anchas: hasta 3 columnas
+  @media (min-width: 640px) {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}
+
+// ── Tarjeta de sustituto ──────────────────────────────────────────────────────
+.sub-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 140px;
+  max-width: 160px;
+  flex-shrink: 0;
+  padding: 0.875rem 0.75rem 0.7rem;
+  background: $surface;
+  border: 2px solid $border;
+  border-radius: $radius-md;
+  cursor: pointer;
+  text-align: center;
+  transition:
+    border-color $transition,
+    box-shadow $transition,
+    transform $transition;
+
+  &:hover {
+    border-color: $amber-dark;
+    box-shadow: 0 4px 16px rgba($amber, 0.22);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.sub-thumb {
+  border-radius: $radius-sm;
+  object-fit: cover;
+  margin-bottom: 0.15rem;
+}
+
+.sub-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: $text;
+  line-height: 1.2;
+}
+
+.sub-ratio {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: $amber-bg;
+  color: $amber-dark;
+  border: 1px solid $amber-border;
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+}
+
+.sub-desc {
+  font-size: 0.73rem;
+  color: $text-muted;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// ── Tags ──────────────────────────────────────────────────────────────────────
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-top: 0.1rem;
+}
+
+.tag {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.tag--vegano       { background: #eafaf1; color: #1e8449; border-color: #a9dfbf; }
+.tag--sin-lactosa  { background: #ebf5fb; color: #1a5276; border-color: #7fb3d3; }
+.tag--sin-gluten   { background: #fef9e7; color: #7d6608; border-color: #f9e79f; }
+.tag--saludable    { background: #e8f8f5; color: #0e6655; border-color: #76d7c4; }
+.tag--económico    { background: #fdf2e9; color: #784212; border-color: #f0b27a; }
+
+// ── CTA del card ──────────────────────────────────────────────────────────────
+.sub-cta {
+  margin-top: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: $amber-dark;
+  opacity: 0;
+  transition: opacity $transition;
+
+  .sub-card:hover & {
+    opacity: 1;
+  }
+}
+
+// ── Workaround: no usar darken() deprecated ───────────────────────────────────
+.panel-title { color: #c0760c; }

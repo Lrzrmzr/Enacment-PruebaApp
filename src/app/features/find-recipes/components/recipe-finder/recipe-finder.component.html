@@ -1,0 +1,142 @@
+<div class="recipe-finder">
+
+  <!-- ══ Sección: búsqueda de ingredientes ══ -->
+  <app-ingredient-search />
+
+  <!-- ══ Sustituciones sugeridas ══ -->
+  <app-substitution-panel />
+
+  <!-- ══ Barra de acción ══ -->
+  <div class="action-bar">
+    <p class="selection-status">
+      @if (state.selectionCount() === 0) {
+        Selecciona al menos {{ state.MIN }} ingredientes para comenzar
+      } @else if (state.selectionCount() < state.MIN) {
+        <span class="status-warn">
+          Faltan {{ state.MIN - state.selectionCount() }} ingrediente(s) más
+        </span>
+      } @else {
+        <span class="status-ok">
+          ✓ {{ state.selectionCount() }} ingredientes listos para buscar
+        </span>
+      }
+    </p>
+
+    <a routerLink="/favoritos" class="btn-favorites" aria-label="Ver mis recetas favoritas">
+      ❤️ Mis favoritos
+    </a>
+
+    <button
+      class="btn-search"
+      [disabled]="!state.canSearch() || isSearching()"
+      (click)="searchRecipes()"
+      aria-label="Buscar recetas con los ingredientes seleccionados"
+    >
+      @if (isSearching()) {
+        <span class="btn-spinner"></span>
+        Buscando…
+      } @else {
+        <span class="btn-icon">🔍</span>
+        Buscar Recetas
+      }
+    </button>
+  </div>
+
+  <!-- ══ Error de búsqueda ══ -->
+  @if (searchError()) {
+    <p class="search-error" role="alert">{{ searchError() }}</p>
+  }
+
+  <!-- ══ Cargando ══ -->
+  @if (isSearching()) {
+    <div class="loading-state" aria-live="polite">
+      <div class="spinner-large"></div>
+      <p>Buscando recetas con tus ingredientes…</p>
+    </div>
+  }
+
+  <!-- ══ Sin resultados ══ -->
+  @if (hasSearched() && !isSearching() && recipes().length === 0 && !searchError()) {
+    <div class="empty-state">
+      <span class="empty-icon">🍽️</span>
+      <h3>Sin resultados</h3>
+      <p>No encontramos recetas que combinen todos esos ingredientes.</p>
+      <p class="empty-hint">Prueba removiendo uno de los ingredientes.</p>
+    </div>
+  }
+
+  <!-- ══ Grid de recetas ══ -->
+  @if (recipes().length > 0) {
+    <section class="results-section" aria-live="polite">
+      <h2 class="results-title">
+        {{ recipes().length }} receta{{ recipes().length === 1 ? '' : 's' }} encontrada{{ recipes().length === 1 ? '' : 's' }}
+      </h2>
+
+      <div class="recipes-grid">
+        @for (recipe of recipes(); track recipe.idMeal) {
+          <article class="recipe-card">
+
+            <!-- Imagen -->
+            <div class="card-image">
+              <img
+                [src]="recipe.strMealThumb"
+                [alt]="recipe.strMeal"
+                loading="lazy"
+              />
+              @if (isFavorite(recipe.idMeal)) {
+                <span class="favorite-badge" aria-label="Guardado en favoritos">❤️</span>
+              }
+            </div>
+
+            <!-- Cuerpo -->
+            <div class="card-body">
+              <h3 class="card-title" [title]="recipe.strMeal">
+                {{ recipe.strMeal }}
+              </h3>
+
+              <!-- Metadatos -->
+              <div class="card-meta">
+                <span class="meta-item meta-time" title="Tiempo estimado de preparación">
+                  <span aria-hidden="true">⏱</span>
+                  {{ recipe.estimatedMinutes }} min
+                </span>
+                <span class="meta-item meta-kcal" title="Estimación calórica">
+                  <span aria-hidden="true">🔥</span>
+                  {{ recipe.estimatedKcal }} kcal
+                </span>
+              </div>
+
+              <!-- Acciones -->
+              <div class="card-actions">
+                <a
+                  [href]="getMealDetailUrl(recipe.idMeal)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn-details"
+                  [attr.aria-label]="'Ver detalles de ' + recipe.strMeal"
+                >Ver detalles</a>
+
+                <button
+                  class="btn-favorite"
+                  [class.is-saved]="isFavorite(recipe.idMeal)"
+                  (click)="toggleFavorite(recipe)"
+                  [attr.aria-label]="(isFavorite(recipe.idMeal) ? 'Eliminar de' : 'Guardar en') + ' favoritos'"
+                >
+                  {{ isFavorite(recipe.idMeal) ? '❤️ Guardado' : '🤍 Guardar' }}
+                </button>
+
+                <a
+                  [routerLink]="['/lista-compras', recipe.idMeal]"
+                  class="btn-shopping"
+                  [attr.aria-label]="'Lista de compras de ' + recipe.strMeal"
+                >🛒 Lista</a>
+              </div>
+            </div>
+
+          </article>
+        }
+      </div>
+    </section>
+  }
+
+</div>

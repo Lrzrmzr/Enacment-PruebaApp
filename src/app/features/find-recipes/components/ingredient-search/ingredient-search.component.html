@@ -1,0 +1,89 @@
+<section class="ingredient-search">
+
+  <!-- ── Encabezado ── -->
+  <header class="search-header">
+    <h2>Selecciona ingredientes</h2>
+    <p class="subtitle">Busca y elige entre {{ state.MIN }} y {{ state.MAX }} ingredientes</p>
+  </header>
+
+  <!-- ── Input de búsqueda ── -->
+  <div class="search-box">
+    <input
+      type="text"
+      class="search-input"
+      placeholder="Escribe un ingrediente… (ej. Chicken, Tomato)"
+      autocomplete="off"
+      [disabled]="isLoading()"
+      (input)="onSearchInput($event)"
+      aria-label="Buscar ingrediente"
+    />
+    @if (isLoading()) {
+      <span class="loader" aria-live="polite">Cargando…</span>
+    }
+  </div>
+
+  <!-- ── Error de carga ── -->
+  @if (errorMessage()) {
+    <p class="error-msg" role="alert">{{ errorMessage() }}</p>
+  }
+
+  <!-- ── Chips de seleccionados ── -->
+  @if (state.selectedIngredients().length > 0) {
+    <div class="selected-section">
+      <span class="selected-label">
+        Seleccionados: {{ state.selectionCount() }} / {{ state.MAX }}
+      </span>
+      <div class="chips" role="list" aria-label="Ingredientes seleccionados">
+        @for (item of state.selectedIngredients(); track item.idIngredient) {
+          <span class="chip" role="listitem">
+            <img
+              [src]="getThumbUrl(item.strIngredient)"
+              [alt]="item.strIngredient"
+              width="20"
+              height="20"
+            />
+            {{ item.strIngredient }}
+            <button
+              class="chip-remove"
+              (click)="state.remove(item)"
+              [attr.aria-label]="'Eliminar ' + item.strIngredient"
+            >✕</button>
+          </span>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ── Lista de resultados de búsqueda ── -->
+  @if (filteredIngredients().length > 0) {
+    <ul class="results-list" role="listbox" aria-label="Resultados de búsqueda">
+      @for (ingredient of filteredIngredients(); track ingredient.idIngredient) {
+        <li
+          class="result-item"
+          role="option"
+          [class.is-selected]="state.isSelected(ingredient)"
+          [class.is-disabled]="!state.canAddMore() && !state.isSelected(ingredient)"
+          [attr.aria-selected]="state.isSelected(ingredient)"
+          (click)="state.add(ingredient)"
+        >
+          <img
+            [src]="getThumbUrl(ingredient.strIngredient)"
+            [alt]="ingredient.strIngredient"
+            width="48"
+            height="48"
+            loading="lazy"
+          />
+          <span class="ingredient-name">{{ ingredient.strIngredient }}</span>
+          @if (state.isSelected(ingredient)) {
+            <span class="check-icon" aria-hidden="true">✓</span>
+          }
+        </li>
+      }
+    </ul>
+  } @else if (searchQuery() && !isLoading()) {
+    <p class="no-results">
+      Sin resultados para "<strong>{{ searchQuery() }}</strong>"
+    </p>
+  }
+
+</section>

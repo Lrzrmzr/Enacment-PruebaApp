@@ -1,0 +1,158 @@
+<div class="shopping-list">
+
+  <!-- ══ CABECERA ══ -->
+  <header class="sl-header no-print">
+    <a routerLink="/buscar" class="back-btn" aria-label="Volver a buscar recetas">
+      &#8592; Volver
+    </a>
+  </header>
+
+  <!-- ══ LOADING ══ -->
+  @if (isLoading()) {
+    <div class="loading" aria-live="polite">
+      <div class="spinner"></div>
+      <p>Cargando ingredientes…</p>
+    </div>
+  }
+
+  <!-- ══ ERROR ══ -->
+  @if (errorMessage()) {
+    <div class="error-state" role="alert">
+      <p>{{ errorMessage() }}</p>
+      <a routerLink="/buscar" class="btn-back-link">Volver a buscar</a>
+    </div>
+  }
+
+  <!-- ══ CONTENIDO ══ -->
+  @if (!isLoading() && !errorMessage() && items().length > 0) {
+
+    <!-- Título de la receta -->
+    <div class="meal-banner">
+      <img
+        [src]="mealThumb()"
+        [alt]="mealName()"
+        class="meal-thumb"
+        loading="eager"
+      />
+      <div class="meal-meta">
+        <span class="meal-category">{{ mealCategory() }}</span>
+        <h1 class="meal-title">{{ mealName() }}</h1>
+        <p class="sl-subtitle">Lista de compras · {{ totalCount() }} ingredientes</p>
+      </div>
+    </div>
+
+    <!-- ── Barra de progreso ── -->
+    <div class="progress-wrap">
+      <div class="progress-bar" role="progressbar"
+        [attr.aria-valuenow]="progressPercent()"
+        aria-valuemin="0"
+        aria-valuemax="100">
+        <div class="progress-fill" [style.width.%]="progressPercent()">
+          @if (progressPercent() > 12) {
+            <span class="progress-text">{{ progressPercent() }}%</span>
+          }
+        </div>
+      </div>
+      <p class="progress-label">
+        @if (allChecked()) {
+          <span class="done-msg">¡Listo para cocinar! 🎉</span>
+        } @else {
+          <span>{{ checkedCount() }} de {{ totalCount() }} comprados</span>
+          @if (pendingCount() > 0) {
+            <span class="pending">· {{ pendingCount() }} pendientes</span>
+          }
+        }
+      </p>
+    </div>
+
+    <!-- ── Acciones masivas ── -->
+    <div class="bulk-actions no-print">
+      <button
+        class="btn-bulk"
+        (click)="toggleAll()"
+        [attr.aria-pressed]="allChecked()"
+      >
+        {{ allChecked() ? '☐ Desmarcar todo' : '☑ Marcar todo' }}
+      </button>
+
+      @if (checkedCount() > 0) {
+        <button class="btn-bulk btn-clear" (click)="clearChecked()">
+          ↺ Limpiar ({{ checkedCount() }})
+        </button>
+      }
+    </div>
+
+    <!-- ══ CHECKLIST ══ -->
+    <ul class="checklist" role="list" aria-label="Lista de ingredientes">
+      @for (item of items(); track item.ingredient; let i = $index) {
+        <li
+          class="check-item"
+          [class.is-checked]="item.checked"
+          (click)="toggleItem(i)"
+          role="checkbox"
+          [attr.aria-checked]="item.checked"
+          [attr.aria-label]="(item.measure ? item.measure + ' de ' : '') + item.ingredient"
+        >
+          <!-- Checkbox visual -->
+          <span class="checkbox" aria-hidden="true">
+            @if (item.checked) { ✓ }
+          </span>
+
+          <!-- Contenido -->
+          <span class="item-content">
+            @if (item.measure) {
+              <span class="item-measure">{{ item.measure }}</span>
+            }
+            <span class="item-ingredient">{{ item.ingredient }}</span>
+          </span>
+        </li>
+      }
+    </ul>
+
+    <!-- ══ EXPORTAR ══ -->
+    <div class="export-section no-print">
+      <h2 class="export-title">Exportar lista</h2>
+      <div class="export-buttons">
+
+        <button class="btn-export btn-txt" (click)="exportText()">
+          <span class="export-icon">📄</span>
+          <span class="export-label">
+            <strong>Texto (.txt)</strong>
+            <small>Descarga como archivo</small>
+          </span>
+        </button>
+
+        <button class="btn-export btn-pdf" (click)="exportPdf()">
+          <span class="export-icon">🖨️</span>
+          <span class="export-label">
+            <strong>Imprimir / PDF</strong>
+            <small>Diálogo de impresión</small>
+          </span>
+        </button>
+
+      </div>
+    </div>
+
+  }
+
+</div>
+
+<!-- ══ VERSIÓN IMPRIMIBLE (solo visible al imprimir) ══ -->
+@if (!isLoading() && items().length > 0) {
+  <div class="print-only print-sheet">
+    <h1 class="print-title">🛒 Lista de compras</h1>
+    <h2 class="print-meal">{{ mealName() }}</h2>
+    <ul class="print-list">
+      @for (item of items(); track item.ingredient) {
+        <li class="print-item" [class.print-checked]="item.checked">
+          <span class="print-checkbox">{{ item.checked ? '✓' : '☐' }}</span>
+          <span class="print-measure">{{ item.measure }}</span>
+          <span class="print-ingredient">{{ item.ingredient }}</span>
+        </li>
+      }
+    </ul>
+    <p class="print-footer">
+      Progreso: {{ checkedCount() }}/{{ totalCount() }} ingredientes
+    </p>
+  </div>
+}

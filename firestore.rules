@@ -1,0 +1,16 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Colección "Favoritos": solo el usuario autenticado propietario puede leer/escribir
+    match /Favoritos/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Bloquear acceso al resto de colecciones por defecto
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
