@@ -42,3 +42,7 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Environment files con claves reales (usa environment.ts como plantilla)
+src/environments/environment.development.ts
+src/environments/environment.prod.ts
