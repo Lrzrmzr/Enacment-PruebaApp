@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, Injector, inject, runInInjectionContext } from '@angular/core';
 import { Auth, authState, signInAnonymously } from '@angular/fire/auth';
 import {
   Firestore,
@@ -28,13 +28,17 @@ import {
 export class FavoritesService {
   private firestore = inject(Firestore);
   private auth = inject(Auth);
+  private injector = inject(Injector);
+
+  // authState$ creado en contexto de inyección (al instanciar el servicio)
+  private authState$ = authState(this.auth);
 
   readonly PAGE_SIZE = 12;
 
   constructor() {
     // Auto sign-in anónimo si no hay usuario activo.
     // Cuando se integre Auth real, esta línea se elimina.
-    authState(this.auth)
+    this.authState$
       .pipe(
         take(1),
         filter((user) => user === null),
@@ -49,7 +53,7 @@ export class FavoritesService {
 
   /** Emite el UID del usuario actual (espera hasta que haya sesión) */
   private userId$(): Observable<string> {
-    return authState(this.auth).pipe(
+    return this.authState$.pipe(
       filter((u): u is NonNullable<typeof u> => u !== null),
       take(1),
       map((u) => u.uid)
@@ -120,12 +124,12 @@ export class FavoritesService {
    * Ideal para sincronizar el ícono de favorito en el grid de RecipeFinderComponent.
    */
   getAllLive(): Observable<FavoriteRecipe[]> {
-    return authState(this.auth).pipe(
+    return this.authState$.pipe(
       switchMap((user) => {
         if (!user) return of([]);
         const col = this.recipesCol(user.uid);
-        return collectionData(
-          query(col, orderBy('savedAt', 'desc'))
+        return runInInjectionContext(this.injector, () =>
+          collectionData(query(col, orderBy('savedAt', 'desc')))
         ) as Observable<FavoriteRecipe[]>;
       })
     );
